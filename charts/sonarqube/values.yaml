@@ -326,7 +326,7 @@ emptyDir: {}
 jdbcDatabaseType: mysql
 
 ## Override JDBC URL
-jdbcUrlOverride: "jdbc:postgresql://sonarqube.cz4xi2df0tar.eu-west-1.rds.amazonaws.com:5432/sonarqube;socketTimeout=1500"
+jdbcUrlOverride: "jdbc:postgresql://sonarqube.cz4xi2df0tar.eu-west-1.rds.amazonaws.com:5432/sonarqube?user=sonarqube&password=Kqy3w3S0AABCtw59"
 
 ## Configuration values for postgresql dependency
 ## ref: https://github.com/kubernetes/charts/blob/master/stable/postgresql/README.md
