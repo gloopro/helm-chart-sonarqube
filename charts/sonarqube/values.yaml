@@ -61,30 +61,31 @@ service:
   #   - 0.0.0.0/0
   # loadBalancerIP: 1.2.3.4
 ingress:
-  enabled: false
+  enabled: true
   # Used to create an Ingress record.
   hosts:
-    - name: sonarqube.your-org.com
+    - name: code.paypecker.co
       # Different clouds or configurations might need /* as the default path
       path: /
       # For additional control over serviceName and servicePort
       # serviceName: someService
       # servicePort: somePort
-  annotations: {}
-  # kubernetes.io/ingress.class: nginx
-  # kubernetes.io/tls-acme: "true"
+  annotations: {
+   kubernetes.io/ingress.class: nginx,
+   kubernetes.io/tls-acme: "true",
   # This property allows for reports up to a certain size to be uploaded to SonarQube
-  # nginx.ingress.kubernetes.io/proxy-body-size: "8m"
+   nginx.ingress.kubernetes.io/proxy-body-size: "8m",
+   cert-manager.io/cluster-issuer: paypecker-issuer
+  }
 
 # Additional labels for Ingress manifest file
   # labels:
   #  traffic-type: external
   #  traffic-type: internal
-  tls: []
-  # Secrets must be manually created in the namespace.
-  # - secretName: chart-example-tls
-  #   hosts:
-  #     - chart-example.local
+  tls:
+    - secretName: paypecker-sonar-tls
+      hosts:
+        - code.paypecker.co
 
 # Affinity for pod assignment
 # Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
@@ -224,8 +225,8 @@ prometheusExporter:
 #    - "https://github.com/AmadeusITGroup/sonar-stash/releases/download/1.3.0/sonar-stash-plugin-1.3.0.jar"
 #    - "https://github.com/SonarSource/sonar-ldap/releases/download/2.2-RC3/sonar-ldap-plugin-2.2.0.601.jar"
 plugins:
-  install: []
-  lib: []
+  install:
+    - "https://github.com/kogitant/sonar-slack-notifier-plugin/releases/download/2.1.2/cks-slack-notifier-2.1.2.jar"
 
   # For use behind a corporate proxy when downloading plugins
   # httpProxy: ""
@@ -274,7 +275,7 @@ resources:
     memory: 4096M
   requests:
     cpu: 400m
-    memory: 2Gi
+    memory: 1Gi
 persistence:
   enabled: false
   ## Set annotations on pvc
@@ -322,16 +323,16 @@ emptyDir: {}
 # sonarSecretKey: "settings-encryption-secret"
 
 ## JDBC Database Type; by default postgresql. To use a different Database type, adjust
-jdbcDatabaseType: postgresql
+jdbcDatabaseType: mysql
 
 ## Override JDBC URL
-# jdbcUrlOverride: "jdbc:postgresql://myPostgress/myDatabase;socketTimeout=1500"
+jdbcUrlOverride: "jdbc:postgresql://sonarqube.cz4xi2df0tar.eu-west-1.rds.amazonaws.com:5432/sonarqube;socketTimeout=1500"
 
 ## Configuration values for postgresql dependency
 ## ref: https://github.com/kubernetes/charts/blob/master/stable/postgresql/README.md
 postgresql:
   # Enable to deploy the PostgreSQL chart
-  enabled: true
+  enabled: false
   # To use an external PostgreSQL instance, set enabled to false and uncomment
   # the line below:
   # postgresqlServer: ""
@@ -340,9 +341,9 @@ postgresql:
   # line below:
   # existingSecret: ""
   # existingSecretPasswordKey: "postgresql-password"
-  postgresqlUsername: "sonarUser"
-  postgresqlPassword: "sonarPass"
-  postgresqlDatabase: "sonarDB"
+  postgresqlUsername: "sonarqube"
+  postgresqlPassword: "Kqy3w3S0AABCtw59"
+  postgresqlDatabase: "sonarqube"
   # Specify the TCP port that PostgreSQL should use
   service:
     port: 5432
